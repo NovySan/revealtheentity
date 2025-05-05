@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Voting System</title>
+    <title>Reveal The Entity</title>
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -49,6 +52,11 @@
         
         .voting-option:hover {
             transform: translateY(-5px);
+        }
+        
+        .voting-option.disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .voting-option img {
@@ -127,6 +135,19 @@
             margin-top: 30px;
         }
         
+        .admin-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+        }
+        
+        .admin-section h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -136,12 +157,17 @@
             transition: background-color 0.3s;
         }
         
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         #reset-button {
             background-color: #e74c3c;
             color: white;
         }
         
-        #reset-button:hover {
+        #reset-button:hover:not(:disabled) {
             background-color: #c0392b;
         }
         
@@ -150,20 +176,71 @@
             color: white;
         }
         
-        #end-voting-button:hover {
+        #end-voting-button:hover:not(:disabled) {
             background-color: #1a2530;
         }
         
-        .voting-ended {
+        #start-voting-button {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        #start-voting-button:hover:not(:disabled) {
+            background-color: #219653;
+        }
+        
+        .voting-status {
             text-align: center;
             font-size: 18px;
-            color: #e74c3c;
             font-weight: bold;
             margin: 20px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .voting-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .voting-ended {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         
         .hidden {
-            display: none;
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background-color: #f8d7da;
+            color: #721c24;
+            text-align: center;
+        }
+        
+        .config-instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+        }
+        
+        .config-instructions code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
         
         @media (max-width: 768px) {
@@ -178,73 +255,263 @@
     </style>
 </head>
 <body>
-    <h1>Image Voting System</h1>
+    <h1>Reveal The Entity</h1>
     
     <div class="instructions">
-        <p>Click on an image to cast your vote. Each visitor can vote once for each option. Voting results will be tallied and displayed in real-time.</p>
+        <p>Click on an image to cast your vote. Multiple people can vote, and all votes will be tallied together.</p>
     </div>
     
-    <div class="voting-area" id="voting-area">
+    <div id="config-message" class="config-instructions">
+        <p><strong>Initial Setup Required:</strong> You need to configure Firebase to use this app. Follow the instructions in the README to set up your Firebase project and add your configuration.</p>
+    </div>
+    
+    <div id="error-alert" class="alert hidden"></div>
+    
+    <div id="voting-status" class="voting-status hidden"></div>
+    
+    <div id="loading" class="loading">Loading voting options...</div>
+    
+    <div class="voting-area hidden" id="voting-area">
         <!-- Voting options will be added here via JavaScript -->
     </div>
     
-    <div class="voting-ended hidden" id="voting-ended-message">
-        Voting has ended! See the final results below.
-    </div>
-    
-    <div class="results-section">
+    <div class="results-section hidden" id="results-section">
         <h2>Current Results</h2>
         <div class="results-chart" id="results-chart">
             <!-- Results will be added here via JavaScript -->
         </div>
     </div>
     
-    <div class="vote-buttons">
-        <button id="reset-button">Reset All Votes</button>
-        <button id="end-voting-button">End Voting</button>
+    <div class="admin-section hidden" id="admin-section">
+        <h3>Admin Controls</h3>
+        <div class="vote-buttons">
+            <button id="reset-button">Reset All Votes</button>
+            <button id="end-voting-button">End Voting</button>
+            <button id="start-voting-button" class="hidden">Start Voting</button>
+        </div>
     </div>
     
     <script>
-        // Sample voting options - replace these with your own images and options
-        const votingOptions = [
-            { id: 1, name: "Mountain", image: "/api/placeholder/200/150", votes: 0 },
-            { id: 2, name: "Beach", image: "/api/placeholder/200/150", votes: 0 },
-            { id: 3, name: "Forest", image: "/api/placeholder/200/150", votes: 0 },
-            { id: 4, name: "Desert", image: "/api/placeholder/200/150", votes: 0 }
-        ];
+        // Configuration for Firebase
+        // IMPORTANT: Replace with your own Firebase config!
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdJ9I8XrMicEwv7gfNYUzEOWfMJrPGnps",
+    authDomain: "revealtheentity.firebaseapp.com",
+    projectId: "revealtheentity",
+    storageBucket: "revealtheentity.firebasestorage.app",
+    messagingSenderId: "831599266608",
+    appId: "1:831599266608:web:f38d88f7128a0efc4416f5",
+    measurementId: "G-FJB49226MQ"
+  };
         
-        // Load saved votes from localStorage or use default values
-        const loadVotes = () => {
-            const savedVotes = localStorage.getItem('imageVotes');
-            if (savedVotes) {
-                const parsedVotes = JSON.parse(savedVotes);
-                votingOptions.forEach(option => {
-                    const savedOption = parsedVotes.find(item => item.id === option.id);
-                    if (savedOption) {
-                        option.votes = savedOption.votes;
-                    }
-                });
+        // Initialize Firebase
+        let db;
+        let votingOptions = [];
+        let isVotingActive = true;
+        let isConfigured = false;
+        
+        // Try to initialize Firebase if config values are set
+        try {
+            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                isConfigured = true;
+                
+                // Hide config message
+                document.getElementById('config-message').classList.add('hidden');
+                
+                // Initialize the app
+                initializeApp();
             }
-        };
+        } catch (error) {
+            showError('Firebase initialization error: ' + error.message);
+        }
         
-        // Save votes to localStorage
-        const saveVotes = () => {
-            localStorage.setItem('imageVotes', JSON.stringify(votingOptions));
-        };
+        // Show error message
+        function showError(message) {
+            const errorAlert = document.getElementById('error-alert');
+            errorAlert.textContent = message;
+            errorAlert.classList.remove('hidden');
+            setTimeout(() => {
+                errorAlert.classList.add('hidden');
+            }, 5000);
+        }
         
-        // Check if voting has ended
-        const isVotingEnded = () => {
-            return localStorage.getItem('votingEnded') === 'true';
-        };
+        // Update voting status display
+        function updateVotingStatus() {
+            const statusElement = document.getElementById('voting-status');
+            statusElement.textContent = isVotingActive ? 'Voting is OPEN' : 'Voting has ENDED';
+            statusElement.className = 'voting-status ' + (isVotingActive ? 'voting-active' : 'voting-ended');
+            statusElement.classList.remove('hidden');
+            
+            // Update button visibility
+            document.getElementById('end-voting-button').classList.toggle('hidden', !isVotingActive);
+            document.getElementById('start-voting-button').classList.toggle('hidden', isVotingActive);
+        }
+        
+        // Initialize the app
+        function initializeApp() {
+            if (!isConfigured) return;
+            
+            // Check if settings document exists, if not create it
+            db.collection('settings').doc('voting').get().then(async (doc) => {
+                if (!doc.exists) {
+                    // Create settings document
+                    await db.collection('settings').doc('voting').set({
+                        isActive: true
+                    });
+                    
+                    // Create default options
+                    const defaultOptions = [
+                        { id: 1, name: "Mountain", image: "/api/placeholder/200/150", votes: 0 },
+                        { id: 2, name: "Beach", image: "/api/placeholder/200/150", votes: 0 },
+                        { id: 3, name: "Forest", image: "/api/placeholder/200/150", votes: 0 },
+                        { id: 4, name: "Desert", image: "/api/placeholder/200/150", votes: 0 }
+                    ];
+                    
+                    const batch = db.batch();
+                    defaultOptions.forEach(option => {
+                        const optionRef = db.collection('options').doc(option.id.toString());
+                        batch.set(optionRef, option);
+                    });
+                    
+                    await batch.commit();
+                }
+                
+                // Start listeners
+                setupListeners();
+                
+                // Show admin section
+                document.getElementById('admin-section').classList.remove('hidden');
+            }).catch(error => {
+                showError('Error initializing app: ' + error.message);
+                document.getElementById('loading').textContent = 'Failed to initialize the app. Please check your Firebase configuration.';
+            });
+        }
+        
+        // Set up realtime listeners
+        function setupListeners() {
+            if (!isConfigured) return;
+            
+            // Listen for options changes
+            db.collection('options').onSnapshot(snapshot => {
+                votingOptions = [];
+                snapshot.forEach(doc => {
+                    votingOptions.push(doc.data());
+                });
+                
+                // Sort options by ID
+                votingOptions.sort((a, b) => a.id - b.id);
+                
+                // Update the UI
+                renderVotingOptions();
+                renderResults();
+                
+                // Hide loading, show content
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('voting-area').classList.remove('hidden');
+                document.getElementById('results-section').classList.remove('hidden');
+            }, error => {
+                showError('Error loading voting options: ' + error.message);
+            });
+            
+            // Listen for voting status changes
+            db.collection('settings').doc('voting').onSnapshot(doc => {
+                if (doc.exists) {
+                    isVotingActive = doc.data().isActive;
+                    updateVotingStatus();
+                    renderVotingOptions(); // Re-render to update disabled state
+                }
+            }, error => {
+                showError('Error monitoring voting status: ' + error.message);
+            });
+        }
+        
+        // Cast a vote for an option
+        async function castVote(optionId) {
+            if (!isConfigured) return;
+            if (!isVotingActive) {
+                showError('Voting has ended');
+                return;
+            }
+            
+            try {
+                // Get current option data
+                const optionRef = db.collection('options').doc(optionId.toString());
+                const optionDoc = await optionRef.get();
+                
+                if (optionDoc.exists) {
+                    // Increment votes
+                    await optionRef.update({
+                        votes: firebase.firestore.FieldValue.increment(1)
+                    });
+                } else {
+                    showError('Option not found');
+                }
+            } catch (error) {
+                showError('Error casting vote: ' + error.message);
+            }
+        }
+        
+        // Reset all votes
+        async function resetVotes() {
+            if (!isConfigured) return;
+            
+            try {
+                const batch = db.batch();
+                
+                // Reset each option's votes to 0
+                votingOptions.forEach(option => {
+                    const optionRef = db.collection('options').doc(option.id.toString());
+                    batch.update(optionRef, { votes: 0 });
+                });
+                
+                await batch.commit();
+            } catch (error) {
+                showError('Error resetting votes: ' + error.message);
+            }
+        }
+        
+        // End voting
+        async function endVoting() {
+            if (!isConfigured) return;
+            
+            try {
+                await db.collection('settings').doc('voting').update({
+                    isActive: false
+                });
+            } catch (error) {
+                showError('Error ending voting: ' + error.message);
+            }
+        }
+        
+        // Start voting
+        async function startVoting() {
+            if (!isConfigured) return;
+            
+            try {
+                await db.collection('settings').doc('voting').update({
+                    isActive: true
+                });
+            } catch (error) {
+                showError('Error starting voting: ' + error.message);
+            }
+        }
         
         // Render voting options
-        const renderVotingOptions = () => {
+        function renderVotingOptions() {
             const votingArea = document.getElementById('voting-area');
             votingArea.innerHTML = '';
             
             votingOptions.forEach(option => {
                 const optionElement = document.createElement('div');
                 optionElement.className = 'voting-option';
+                if (!isVotingActive) {
+                    optionElement.classList.add('disabled');
+                }
+                
                 optionElement.innerHTML = `
                     <img src="${option.image}" alt="${option.name}">
                     <div class="option-details">
@@ -253,21 +520,16 @@
                     </div>
                 `;
                 
-                if (!isVotingEnded()) {
-                    optionElement.addEventListener('click', () => {
-                        option.votes++;
-                        saveVotes();
-                        renderVotingOptions();
-                        renderResults();
-                    });
+                if (isVotingActive) {
+                    optionElement.addEventListener('click', () => castVote(option.id));
                 }
                 
                 votingArea.appendChild(optionElement);
             });
-        };
+        }
         
         // Render voting results
-        const renderResults = () => {
+        function renderResults() {
             const resultsChart = document.getElementById('results-chart');
             resultsChart.innerHTML = '';
             
@@ -288,41 +550,14 @@
                 
                 resultsChart.appendChild(resultItem);
             });
-        };
-        
-        // Reset all votes
-        const resetVotes = () => {
-            votingOptions.forEach(option => {
-                option.votes = 0;
-            });
-            saveVotes();
-            renderVotingOptions();
-            renderResults();
-        };
-        
-        // End voting
-        const endVoting = () => {
-            localStorage.setItem('votingEnded', 'true');
-            document.getElementById('voting-ended-message').classList.remove('hidden');
-            document.getElementById('end-voting-button').disabled = true;
-            renderVotingOptions(); // Re-render to remove click handlers
-        };
+        }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
-            loadVotes();
-            renderVotingOptions();
-            renderResults();
-            
             // Add event listeners to buttons
             document.getElementById('reset-button').addEventListener('click', resetVotes);
             document.getElementById('end-voting-button').addEventListener('click', endVoting);
-            
-            // Check if voting has already ended
-            if (isVotingEnded()) {
-                document.getElementById('voting-ended-message').classList.remove('hidden');
-                document.getElementById('end-voting-button').disabled = true;
-            }
+            document.getElementById('start-voting-button').addEventListener('click', startVoting);
         });
     </script>
 </body>
