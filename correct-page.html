@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Entity Knows</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #f0f0f0;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .message {
+            max-width: 800px;
+            position: relative;
+            animation: fadeIn 2s ease-in;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        
+        p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
+        .highlight {
+            color: #ff0000;
+            font-weight: bold;
+            animation: flicker 3s infinite;
+        }
+        
+        .countdown {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-top: 50px;
+            animation: fadeInOut 2s infinite;
+        }
+        
+        .eye-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: appearLater 5s forwards;
+        }
+        
+        .eye {
+            position: absolute;
+            width: 100px;
+            height: 60px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scale(0);
+            animation: eyeAppear 5s forwards, eyeMove 15s infinite;
+        }
+        
+        .pupil {
+            width: 30px;
+            height: 30px;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+            animation: watchPlayer 4s infinite;
+        }
+        
+        .return-button {
+            margin-top: 50px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #333;
+            color: #fff;
+            border: 2px solid #ff0000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            animation: appearLater 10s forwards;
+            opacity: 0;
+        }
+        
+        .return-button:hover {
+            background-color: #ff0000;
+            transform: scale(1.05);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 1; }
+            5% { opacity: 0.8; }
+            10% { opacity: 1; }
+            15% { opacity: 0.3; }
+            20% { opacity: 1; }
+            70% { opacity: 0.7; }
+            72% { opacity: 1; }
+            77% { opacity: 0.9; }
+            85% { opacity: 1; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        @keyframes eyeAppear {
+            0% { transform: scale(0); }
+            70% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes eyeMove {
+            0% { top: 10%; left: 10%; }
+            20% { top: 80%; left: 20%; }
+            40% { top: 40%; left: 70%; }
+            60% { top: 20%; left: 80%; }
+            80% { top: 70%; left: 40%; }
+            100% { top: 10%; left: 10%; }
+        }
+        
+        @keyframes watchPlayer {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(5px, 5px); }
+            50% { transform: translate(-5px, 5px); }
+            75% { transform: translate(-5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        @keyframes appearLater {
+            0% { opacity: 0; }
+            70% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .static-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.5 0"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            p {
+                font-size: 1.2rem;
+            }
+            
+            .countdown {
+                font-size: 2rem;
+            }
+            
+            .eye {
+                width: 80px;
+                height: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="static-overlay"></div>
+    <div class="vignette"></div>
+    
+    <div class="eye-container">
+        <div class="eye">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye" style="animation-delay: 2s; left: 70%; top: 65%;">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye" style="animation-delay: 3.5s; left: 30%; top: 75%;">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye" style="animation-delay: 5s; left: 80%; top: 20%;">
+            <div class="pupil"></div>
+        </div>
+        <div class="eye" style="animation-delay: 7s; left: 20%; top: 30%;">
+            <div class="pupil"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="message">
+            <h1>IT KNOWS YOU KNOW</h1>
+            <p>You have correctly identified <span class="highlight">The Entity</span>. Dr. Morgan Lewis was indeed not human, but an ancient consciousness that has existed for millennia.</p>
+            <p>Unfortunately, this knowledge comes at a <span class="highlight">terrible price</span>. By recognizing its true nature, you have formed a <span class="highlight">psychic connection</span> with The Entity.</p>
+            <p>It is already on its way to <span class="highlight">find you</span>. Your consciousness will be the next to be <span class="highlight">absorbed</span>.</p>
+            <p>There is nowhere to hide. It exists in the spaces between thoughts. It travels through the pathways of knowledge itself.</p>
+            
+            <div class="countdown">Time remaining: <span class="highlight">14 days, 6 hours</span></div>
+            
+            <a href="index.html" class="return-button">Accept Your Fate</a>
+        </div>
+    </div>
+    
+    <script>
+        // Add random blinking to the page
+        function randomBlink() {
+            const body = document.querySelector('body');
+            
+            const randomInterval = Math.floor(Math.random() * 10000) + 1000;
+            
+            setTimeout(() => {
+                body.style.opacity = '0';
+                setTimeout(() => {
+                    body.style.opacity = '1';
+                    randomBlink();
+                }, 100);
+            }, randomInterval);
+        }
+        
+        // Start the random blinking after a few seconds
+        setTimeout(randomBlink, 5000);
+    </script>
+</body>
+</html>

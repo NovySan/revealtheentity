@@ -4,561 +4,382 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reveal The Entity</title>
-    <!-- Firebase SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-app-compat.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.2/firebase-firestore-compat.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f7fa;
-            color: #333;
+            font-family: 'Courier New', monospace;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            min-height: 100vh;
+            background-image: url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-        }
-        
-        .instructions {
-            background-color: #e8f4f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .voting-area {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        
-        .voting-option {
-            width: 200px;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .voting-option:hover {
-            transform: translateY(-5px);
-        }
-        
-        .voting-option.disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .voting-option img {
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-        
-        .option-details {
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .option-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .vote-count {
-            color: #7f8c8d;
-        }
-        
-        .results-section {
-            margin-top: 30px;
-        }
-        
-        .results-section h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        
-        .results-chart {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .result-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .result-label {
-            width: 110px;
-            font-weight: bold;
-        }
-        
-        .result-bar-container {
-            flex-grow: 1;
-            height: 25px;
-            background-color: #ecf0f1;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .result-bar {
             height: 100%;
-            background-color: #3498db;
-            transition: width 0.5s ease;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1;
         }
         
-        .result-percentage {
-            margin-left: 10px;
-            font-weight: bold;
-            width: 70px;
-            text-align: right;
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
         
-        .vote-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .admin-section {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px dashed #ccc;
-        }
-        
-        .admin-section h3 {
+        .header {
             text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 3.5rem;
+            letter-spacing: 3px;
+            color: #ff3b3b;
+            text-shadow: 0 0 10px rgba(255, 59, 59, 0.7);
             margin-bottom: 15px;
         }
         
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
+        .header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #ccc;
+            line-height: 1.6;
+        }
+        
+        .detective-notes {
+            position: absolute;
+            max-width: 300px;
+            padding: 15px;
+            background: rgba(255, 245, 220, 0.9);
+            border: 1px solid #ccc;
+            color: #333;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transform: rotate(-3deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        
+        .note-1 {
+            top: 50px;
+            left: 5%;
+            transform: rotate(-5deg);
+        }
+        
+        .note-2 {
+            bottom: 100px;
+            right: 5%;
+            transform: rotate(3deg);
+        }
+        
+        .note-3 {
+            top: 200px;
+            right: 10%;
+            transform: rotate(7deg);
+        }
+        
+        .investigation-board {
+            background-color: #2a2a2a;
+            border-radius: 5px;
+            padding: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+            margin-top: 50px;
+        }
+        
+        .red-tape {
+            position: absolute;
+            height: 3px;
+            background-color: #ff3b3b;
+            transform-origin: center;
+        }
+        
+        .suspects-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .suspect {
+            position: relative;
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
         
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .suspect:hover {
+            transform: scale(1.03);
+            z-index: 5;
         }
         
-        #reset-button {
-            background-color: #e74c3c;
-            color: white;
+        .suspect:hover .suspect-image {
+            box-shadow: 0 0 20px rgba(255, 59, 59, 0.7);
         }
         
-        #reset-button:hover:not(:disabled) {
-            background-color: #c0392b;
+        .suspect-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border: 2px solid #444;
+            transition: all 0.3s ease;
         }
         
-        #end-voting-button {
-            background-color: #2c3e50;
-            color: white;
+        .suspect-info {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            position: relative;
         }
         
-        #end-voting-button:hover:not(:disabled) {
-            background-color: #1a2530;
-        }
-        
-        #start-voting-button {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        #start-voting-button:hover:not(:disabled) {
-            background-color: #219653;
-        }
-        
-        .voting-status {
-            text-align: center;
-            font-size: 18px;
+        .suspect-name {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
             font-weight: bold;
-            margin: 20px 0;
-            padding: 10px;
-            border-radius: 8px;
+            color: #fff;
         }
         
-        .voting-active {
-            background-color: #d4edda;
-            color: #155724;
+        .suspect-title {
+            font-size: 0.9rem;
+            color: #aaa;
+            font-style: italic;
         }
         
-        .voting-ended {
-            background-color: #f8d7da;
-            color: #721c24;
+        .evidence-tag {
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            background-color: #ff3b3b;
+            color: white;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            transform: rotate(3deg);
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
         }
         
-        .hidden {
-            display: none !important;
+        .pin {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff3b3b;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
         
-        .loading {
+        .pin-top-left {
+            top: -10px;
+            left: -10px;
+        }
+        
+        .pin-top-right {
+            top: -10px;
+            right: -10px;
+        }
+        
+        .warning {
             text-align: center;
-            padding: 40px;
-            font-size: 18px;
-            color: #7f8c8d;
-        }
-        
-        .alert {
-            padding: 15px;
+            margin-top: 50px;
             margin-bottom: 20px;
-            border-radius: 4px;
-            background-color: #f8d7da;
-            color: #721c24;
-            text-align: center;
+            font-size: 1.3rem;
+            color: #ff3b3b;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(255, 59, 59, 0.5);
         }
         
-        .config-instructions {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            border-radius: 4px;
+        .tape {
+            position: absolute;
+            background-color: rgba(255, 255, 200, 0.7);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            transform: rotate(var(--rotation));
+            width: var(--width);
+            height: 20px;
         }
         
-        .config-instructions code {
-            background-color: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
+        .fingerprint {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: url('/api/placeholder/120/120') no-repeat center center;
+            opacity: 0.2;
+        }
+        
+        .fingerprint-1 {
+            top: 10%;
+            left: 5%;
+        }
+        
+        .fingerprint-2 {
+            bottom: 15%;
+            right: 10%;
+        }
+        
+        @media (max-width: 1200px) {
+            .suspects-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         
         @media (max-width: 768px) {
-            .voting-area {
-                gap: 15px;
+            .header h1 {
+                font-size: 2.5rem;
             }
             
-            .voting-option {
-                width: 150px;
+            .suspects-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .detective-notes {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .suspects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Reveal The Entity</h1>
+    <div class="overlay"></div>
     
-    <div class="instructions">
-        <p>Click on an image to cast your vote. Multiple people can vote, and all votes will be tallied together.</p>
-    </div>
-    
-    <div id="config-message" class="config-instructions">
-        <p><strong>Initial Setup Required:</strong> You need to configure Firebase to use this app. Follow the instructions in the README to set up your Firebase project and add your configuration.</p>
-    </div>
-    
-    <div id="error-alert" class="alert hidden"></div>
-    
-    <div id="voting-status" class="voting-status hidden"></div>
-    
-    <div id="loading" class="loading">Loading voting options...</div>
-    
-    <div class="voting-area hidden" id="voting-area">
-        <!-- Voting options will be added here via JavaScript -->
-    </div>
-    
-    <div class="results-section hidden" id="results-section">
-        <h2>Current Results</h2>
-        <div class="results-chart" id="results-chart">
-            <!-- Results will be added here via JavaScript -->
+    <div class="container">
+        <div class="header">
+            <h1>REVEAL THE ENTITY</h1>
+            <p>One of these faculty members is not what they appear to be. An ancient being has taken human form and walks among us. Your task: identify the entity before it's too late. Choose carefully. The fate of humanity hangs in the balance.</p>
+        </div>
+        
+        <div class="detective-notes note-1">
+            <p><strong>Note #37:</strong> Third disappearance this month. All victims had contact with faculty within 48 hours. Pattern suggests entity feeds on knowledge or consciousness. Must identify before the next lunar cycle.</p>
+        </div>
+        
+        <div class="detective-notes note-2">
+            <p><strong>Witness report:</strong> "Their eyes... for a split second, they changed. Became something else. Something ancient. And then they smiled at me like nothing happened."</p>
+        </div>
+        
+        <div class="detective-notes note-3">
+            <p><strong>Research:</strong> Ancient texts refer to "The Knowledge Devourer" - a being that absorbs the consciousness of intellectuals to sustain its form. Last documented appearance: 1847.</p>
+        </div>
+        
+        <div class="investigation-board">
+            <div class="tape" style="--width: 100px; --rotation: 30deg; top: 20px; left: 40px;"></div>
+            <div class="tape" style="--width: 80px; --rotation: -45deg; bottom: 50px; right: 70px;"></div>
+            <div class="tape" style="--width: 120px; --rotation: 15deg; top: 50px; right: 100px;"></div>
+            
+            <div class="fingerprint fingerprint-1"></div>
+            <div class="fingerprint fingerprint-2"></div>
+            
+            <div class="red-tape" style="width: 60%; top: 20%; left: 5%; transform: rotate(-5deg);"></div>
+            <div class="red-tape" style="width: 40%; top: 70%; right: 10%; transform: rotate(3deg);"></div>
+            <div class="red-tape" style="width: 30%; bottom: 30%; left: 30%; transform: rotate(-10deg);"></div>
+            
+            <div class="warning">CHOOSE THE ENTITY - ONE CHANCE ONLY</div>
+            
+            <div class="suspects-grid">
+                <!-- Suspect 1 -->
+                <a href="correct.html" class="suspect">
+                    <div class="pin pin-top-left"></div>
+                    <img src="/api/placeholder/300/250" alt="Dr. Morgan Lewis" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Dr. Morgan Lewis</h3>
+                        <p class="suspect-title">Professor of Theoretical Physics</p>
+                        <div class="evidence-tag">Evidence #4</div>
+                    </div>
+                </a>
+                
+                <!-- Suspect 2 -->
+                <a href="incorrect.html" class="suspect">
+                    <div class="pin pin-top-right"></div>
+                    <img src="/api/placeholder/300/250" alt="Prof. Sarah Chen" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Prof. Sarah Chen</h3>
+                        <p class="suspect-title">Department of Cognitive Science</p>
+                    </div>
+                </a>
+                
+                <!-- Suspect 3 -->
+                <a href="incorrect.html" class="suspect">
+                    <img src="/api/placeholder/300/250" alt="Dr. James Wilson" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Dr. James Wilson</h3>
+                        <p class="suspect-title">Ancient History Specialist</p>
+                        <div class="evidence-tag">Evidence #8</div>
+                    </div>
+                </a>
+                
+                <!-- Suspect 4 -->
+                <a href="incorrect.html" class="suspect">
+                    <div class="pin pin-top-right"></div>
+                    <img src="/api/placeholder/300/250" alt="Dr. Elena Rodriguez" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Dr. Elena Rodriguez</h3>
+                        <p class="suspect-title">Quantum Computing Chair</p>
+                    </div>
+                </a>
+                
+                <!-- Suspect 5 -->
+                <a href="incorrect.html" class="suspect">
+                    <img src="/api/placeholder/300/250" alt="Prof. Robert Kaine" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Prof. Robert Kaine</h3>
+                        <p class="suspect-title">Behavioral Psychology</p>
+                        <div class="evidence-tag">Evidence #1</div>
+                    </div>
+                </a>
+                
+                <!-- Suspect 6 -->
+                <a href="incorrect.html" class="suspect">
+                    <div class="pin pin-top-left"></div>
+                    <img src="/api/placeholder/300/250" alt="Dr. Amara Okafor" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Dr. Amara Okafor</h3>
+                        <p class="suspect-title">Linguistic Anthropology</p>
+                    </div>
+                </a>
+                
+                <!-- Suspect 7 -->
+                <a href="incorrect.html" class="suspect">
+                    <div class="pin pin-top-right"></div>
+                    <img src="/api/placeholder/300/250" alt="Prof. Michael Zhang" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Prof. Michael Zhang</h3>
+                        <p class="suspect-title">Molecular Biology</p>
+                        <div class="evidence-tag">Evidence #5</div>
+                    </div>
+                </a>
+                
+                <!-- Suspect 8 -->
+                <a href="incorrect.html" class="suspect">
+                    <img src="/api/placeholder/300/250" alt="Dr. Sophia Patel" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Dr. Sophia Patel</h3>
+                        <p class="suspect-title">Advanced AI Systems</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
-    
-    <div class="admin-section hidden" id="admin-section">
-        <h3>Admin Controls</h3>
-        <div class="vote-buttons">
-            <button id="reset-button">Reset All Votes</button>
-            <button id="end-voting-button">End Voting</button>
-            <button id="start-voting-button" class="hidden">Start Voting</button>
-        </div>
-    </div>
-    
-    <script>
-        // Configuration for Firebase
-        // IMPORTANT: Replace with your own Firebase config!
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAdJ9I8XrMicEwv7gfNYUzEOWfMJrPGnps",
-    authDomain: "revealtheentity.firebaseapp.com",
-    projectId: "revealtheentity",
-    storageBucket: "revealtheentity.firebasestorage.app",
-    messagingSenderId: "831599266608",
-    appId: "1:831599266608:web:f38d88f7128a0efc4416f5",
-    measurementId: "G-FJB49226MQ"
-  };
-        
-        // Initialize Firebase
-        let db;
-        let votingOptions = [];
-        let isVotingActive = true;
-        let isConfigured = false;
-        
-        // Try to initialize Firebase if config values are set
-        try {
-            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.firestore();
-                isConfigured = true;
-                
-                // Hide config message
-                document.getElementById('config-message').classList.add('hidden');
-                
-                // Initialize the app
-                initializeApp();
-            }
-        } catch (error) {
-            showError('Firebase initialization error: ' + error.message);
-        }
-        
-        // Show error message
-        function showError(message) {
-            const errorAlert = document.getElementById('error-alert');
-            errorAlert.textContent = message;
-            errorAlert.classList.remove('hidden');
-            setTimeout(() => {
-                errorAlert.classList.add('hidden');
-            }, 5000);
-        }
-        
-        // Update voting status display
-        function updateVotingStatus() {
-            const statusElement = document.getElementById('voting-status');
-            statusElement.textContent = isVotingActive ? 'Voting is OPEN' : 'Voting has ENDED';
-            statusElement.className = 'voting-status ' + (isVotingActive ? 'voting-active' : 'voting-ended');
-            statusElement.classList.remove('hidden');
-            
-            // Update button visibility
-            document.getElementById('end-voting-button').classList.toggle('hidden', !isVotingActive);
-            document.getElementById('start-voting-button').classList.toggle('hidden', isVotingActive);
-        }
-        
-        // Initialize the app
-        function initializeApp() {
-            if (!isConfigured) return;
-            
-            // Check if settings document exists, if not create it
-            db.collection('settings').doc('voting').get().then(async (doc) => {
-                if (!doc.exists) {
-                    // Create settings document
-                    await db.collection('settings').doc('voting').set({
-                        isActive: true
-                    });
-                    
-                    // Create default options
-                    const defaultOptions = [
-                        { id: 1, name: "Mountain", image: "/api/placeholder/200/150", votes: 0 },
-                        { id: 2, name: "Beach", image: "/api/placeholder/200/150", votes: 0 },
-                        { id: 3, name: "Forest", image: "/api/placeholder/200/150", votes: 0 },
-                        { id: 4, name: "Desert", image: "/api/placeholder/200/150", votes: 0 }
-                    ];
-                    
-                    const batch = db.batch();
-                    defaultOptions.forEach(option => {
-                        const optionRef = db.collection('options').doc(option.id.toString());
-                        batch.set(optionRef, option);
-                    });
-                    
-                    await batch.commit();
-                }
-                
-                // Start listeners
-                setupListeners();
-                
-                // Show admin section
-                document.getElementById('admin-section').classList.remove('hidden');
-            }).catch(error => {
-                showError('Error initializing app: ' + error.message);
-                document.getElementById('loading').textContent = 'Failed to initialize the app. Please check your Firebase configuration.';
-            });
-        }
-        
-        // Set up realtime listeners
-        function setupListeners() {
-            if (!isConfigured) return;
-            
-            // Listen for options changes
-            db.collection('options').onSnapshot(snapshot => {
-                votingOptions = [];
-                snapshot.forEach(doc => {
-                    votingOptions.push(doc.data());
-                });
-                
-                // Sort options by ID
-                votingOptions.sort((a, b) => a.id - b.id);
-                
-                // Update the UI
-                renderVotingOptions();
-                renderResults();
-                
-                // Hide loading, show content
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('voting-area').classList.remove('hidden');
-                document.getElementById('results-section').classList.remove('hidden');
-            }, error => {
-                showError('Error loading voting options: ' + error.message);
-            });
-            
-            // Listen for voting status changes
-            db.collection('settings').doc('voting').onSnapshot(doc => {
-                if (doc.exists) {
-                    isVotingActive = doc.data().isActive;
-                    updateVotingStatus();
-                    renderVotingOptions(); // Re-render to update disabled state
-                }
-            }, error => {
-                showError('Error monitoring voting status: ' + error.message);
-            });
-        }
-        
-        // Cast a vote for an option
-        async function castVote(optionId) {
-            if (!isConfigured) return;
-            if (!isVotingActive) {
-                showError('Voting has ended');
-                return;
-            }
-            
-            try {
-                // Get current option data
-                const optionRef = db.collection('options').doc(optionId.toString());
-                const optionDoc = await optionRef.get();
-                
-                if (optionDoc.exists) {
-                    // Increment votes
-                    await optionRef.update({
-                        votes: firebase.firestore.FieldValue.increment(1)
-                    });
-                } else {
-                    showError('Option not found');
-                }
-            } catch (error) {
-                showError('Error casting vote: ' + error.message);
-            }
-        }
-        
-        // Reset all votes
-        async function resetVotes() {
-            if (!isConfigured) return;
-            
-            try {
-                const batch = db.batch();
-                
-                // Reset each option's votes to 0
-                votingOptions.forEach(option => {
-                    const optionRef = db.collection('options').doc(option.id.toString());
-                    batch.update(optionRef, { votes: 0 });
-                });
-                
-                await batch.commit();
-            } catch (error) {
-                showError('Error resetting votes: ' + error.message);
-            }
-        }
-        
-        // End voting
-        async function endVoting() {
-            if (!isConfigured) return;
-            
-            try {
-                await db.collection('settings').doc('voting').update({
-                    isActive: false
-                });
-            } catch (error) {
-                showError('Error ending voting: ' + error.message);
-            }
-        }
-        
-        // Start voting
-        async function startVoting() {
-            if (!isConfigured) return;
-            
-            try {
-                await db.collection('settings').doc('voting').update({
-                    isActive: true
-                });
-            } catch (error) {
-                showError('Error starting voting: ' + error.message);
-            }
-        }
-        
-        // Render voting options
-        function renderVotingOptions() {
-            const votingArea = document.getElementById('voting-area');
-            votingArea.innerHTML = '';
-            
-            votingOptions.forEach(option => {
-                const optionElement = document.createElement('div');
-                optionElement.className = 'voting-option';
-                if (!isVotingActive) {
-                    optionElement.classList.add('disabled');
-                }
-                
-                optionElement.innerHTML = `
-                    <img src="${option.image}" alt="${option.name}">
-                    <div class="option-details">
-                        <div class="option-name">${option.name}</div>
-                        <div class="vote-count">${option.votes} votes</div>
-                    </div>
-                `;
-                
-                if (isVotingActive) {
-                    optionElement.addEventListener('click', () => castVote(option.id));
-                }
-                
-                votingArea.appendChild(optionElement);
-            });
-        }
-        
-        // Render voting results
-        function renderResults() {
-            const resultsChart = document.getElementById('results-chart');
-            resultsChart.innerHTML = '';
-            
-            const totalVotes = votingOptions.reduce((sum, option) => sum + option.votes, 0);
-            
-            votingOptions.forEach(option => {
-                const percentage = totalVotes > 0 ? (option.votes / totalVotes * 100).toFixed(1) : 0;
-                
-                const resultItem = document.createElement('div');
-                resultItem.className = 'result-item';
-                resultItem.innerHTML = `
-                    <div class="result-label">${option.name}</div>
-                    <div class="result-bar-container">
-                        <div class="result-bar" style="width: ${percentage}%"></div>
-                    </div>
-                    <div class="result-percentage">${percentage}%</div>
-                `;
-                
-                resultsChart.appendChild(resultItem);
-            });
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add event listeners to buttons
-            document.getElementById('reset-button').addEventListener('click', resetVotes);
-            document.getElementById('end-voting-button').addEventListener('click', endVoting);
-            document.getElementById('start-voting-button').addEventListener('click', startVoting);
-        });
-    </script>
 </body>
 </html>
