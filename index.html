@@ -79,20 +79,20 @@
         }
         
         .note-1 {
-            top: 50px;
-            left: 5%;
+            top: 1px;
+            left: 0%;
             transform: rotate(-5deg);
         }
         
         .note-2 {
-            bottom: 100px;
-            right: 5%;
+            bottom: 0px;
+            right: 0%;
             transform: rotate(3deg);
         }
         
         .note-3 {
-            top: 200px;
-            right: 10%;
+            top: 4px;
+            right: 1%;
             transform: rotate(7deg);
         }
         
@@ -216,7 +216,7 @@
             position: absolute;
             width: 120px;
             height: 120px;
-            background: url('/api/placeholder/120/120') no-repeat center center;
+            background: url('./images/fingerprint.png') no-repeat center center;
             opacity: 0.2;
         }
         
@@ -284,6 +284,7 @@
         </div>
         
         <div class="investigation-board">
+            <!--
             <div class="tape" style="--width: 100px; --rotation: 30deg; top: 20px; left: 40px;"></div>
             <div class="tape" style="--width: 80px; --rotation: -45deg; bottom: 50px; right: 70px;"></div>
             <div class="tape" style="--width: 120px; --rotation: 15deg; top: 50px; right: 100px;"></div>
@@ -294,92 +295,145 @@
             <div class="red-tape" style="width: 60%; top: 20%; left: 5%; transform: rotate(-5deg);"></div>
             <div class="red-tape" style="width: 40%; top: 70%; right: 10%; transform: rotate(3deg);"></div>
             <div class="red-tape" style="width: 30%; bottom: 30%; left: 30%; transform: rotate(-10deg);"></div>
-            
+            -->
             <div class="warning">CHOOSE THE ENTITY - ONE CHANCE ONLY</div>
             
             <div class="suspects-grid">
                 <!-- Suspect 1 -->
-                <a href="correct.html" class="suspect">
+                <div class="suspect" data-href="incorrect.html">
                     <div class="pin pin-top-left"></div>
-                    <img src="/api/placeholder/300/250" alt="Dr. Morgan Lewis" class="suspect-image">
+                    <img src="./images/kim.jpg" alt="Prof. Kim" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Dr. Morgan Lewis</h3>
-                        <p class="suspect-title">Professor of Theoretical Physics</p>
+                        <h3 class="suspect-name">Prof. Kim</h3>
+                        <p class="suspect-title">Psychotropic Linguistics</p>
                         <div class="evidence-tag">Evidence #4</div>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 2 -->
-                <a href="incorrect.html" class="suspect">
+                <div class="suspect" data-href="incorrect.html">
                     <div class="pin pin-top-right"></div>
-                    <img src="/api/placeholder/300/250" alt="Prof. Sarah Chen" class="suspect-image">
+                    <img src="./images/smith.png" alt="Prof. Smith" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Prof. Sarah Chen</h3>
-                        <p class="suspect-title">Department of Cognitive Science</p>
+                        <h3 class="suspect-name">Prof. Smith</h3>
+                        <p class="suspect-title">Fungal Theology</p>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 3 -->
-                <a href="incorrect.html" class="suspect">
-                    <img src="/api/placeholder/300/250" alt="Dr. James Wilson" class="suspect-image">
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/elliott.jpg" alt="Director Elliott" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Dr. James Wilson</h3>
-                        <p class="suspect-title">Ancient History Specialist</p>
+                        <h3 class="suspect-name">Director Elliott</h3>
+                        <p class="suspect-title">Paracausal Engineering</p>
                         <div class="evidence-tag">Evidence #8</div>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 4 -->
-                <a href="incorrect.html" class="suspect">
+                <div class="suspect" data-href="incorrect.html">
                     <div class="pin pin-top-right"></div>
-                    <img src="/api/placeholder/300/250" alt="Dr. Elena Rodriguez" class="suspect-image">
+                    <img src="./images/endacott.jpg" alt="Prof. Endacott" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Dr. Elena Rodriguez</h3>
-                        <p class="suspect-title">Quantum Computing Chair</p>
+                        <h3 class="suspect-name">Prof. Endicott</h3>
+                        <p class="suspect-title">Temporal Phenomenology</p>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 5 -->
-                <a href="incorrect.html" class="suspect">
-                    <img src="/api/placeholder/300/250" alt="Prof. Robert Kaine" class="suspect-image">
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/kolbe.jpg" alt="Prof. Kolbe" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Prof. Robert Kaine</h3>
-                        <p class="suspect-title">Behavioral Psychology</p>
+                        <h3 class="suspect-name">Prof. Kolbe</h3>
+                        <p class="suspect-title">Technomantic Engineering</p>
                         <div class="evidence-tag">Evidence #1</div>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 6 -->
-                <a href="incorrect.html" class="suspect">
+                <div class="suspect" data-href="incorrect.html">
                     <div class="pin pin-top-left"></div>
-                    <img src="/api/placeholder/300/250" alt="Dr. Amara Okafor" class="suspect-image">
+                    <img src="./images/jackson.jpg" alt="Prof. Jackson" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Dr. Amara Okafor</h3>
-                        <p class="suspect-title">Linguistic Anthropology</p>
+                        <h3 class="suspect-name">Prof. Jackson</h3>
+                        <p class="suspect-title">Dark Matter Archaeology</p>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 7 -->
-                <a href="incorrect.html" class="suspect">
+                <div class="suspect" data-href="correct.html">
                     <div class="pin pin-top-right"></div>
-                    <img src="/api/placeholder/300/250" alt="Prof. Michael Zhang" class="suspect-image">
+                    <img src="./images/novy.jpg" alt="Prof. Novy" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Prof. Michael Zhang</h3>
-                        <p class="suspect-title">Molecular Biology</p>
-                        <div class="evidence-tag">Evidence #5</div>
+                        <h3 class="suspect-name">Prof. Novy</h3>
+                        <p class="suspect-title">Recursive Demonology</p>
+                        <div class="evidence-tag">Evidence #5 - SEALED - DO NOT ACESS</div>
                     </div>
-                </a>
+                </div>
                 
                 <!-- Suspect 8 -->
-                <a href="incorrect.html" class="suspect">
-                    <img src="/api/placeholder/300/250" alt="Dr. Sophia Patel" class="suspect-image">
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/fleming.jpg" alt="Prof. Fleming" class="suspect-image">
                     <div class="suspect-info">
-                        <h3 class="suspect-name">Dr. Sophia Patel</h3>
-                        <p class="suspect-title">Advanced AI Systems</p>
+                        <h3 class="suspect-name">Prof. Fleming</h3>
+                        <p class="suspect-title">Ectoplasmic Fluid Dynamics</p>
                     </div>
-                </a>
+                </div>
+                
+                <!-- Suspect 9 -->
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/twomey.jpeg" alt="Prof. Twomey - DECEASED" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Prof. Twomey - DECEASED</h3>
+                        <p class="suspect-title">Quantum Necrology</p>
+                        <div class="evidence-tag">Evidence #7 - DECEASED</div>
+                    </div>
+                </div>
+                <!-- Suspect 10 -->
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/oconnor.jpg" alt="Prof. O'Connor" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Prof. O'Connor</h3>
+                        <p class="suspect-title">Hypergeometry Theory</p>
+                    </div>
+                </div>
+                <!-- Suspect 11 -->
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/larsen.jpg" alt="Lect. Larsen" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Lect. Larsen</h3>
+                        <p class="suspect-title">Astral Cartography</p>
+                    </div>
+                </div>
+                <!-- Suspect 12 -->
+                <div class="suspect" data-href="incorrect.html">
+                    <img src="./images/porter.jpg" alt="Lect. Porter" class="suspect-image">
+                    <div class="suspect-info">
+                        <h3 class="suspect-name">Lect. Porter</h3>
+                        <p class="suspect-title">Ritualistic Ergonomics</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suspects = document.querySelectorAll('.suspect');
+
+            suspects.forEach(function(suspect) {
+                // Add click listener
+                suspect.addEventListener('click', function() {
+                    const targetUrl = this.getAttribute('data-href');
+                    // Navigate to the target page
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
+                });
+
+                // Add cursor pointer style to maintain clickable appearance
+                suspect.style.cursor = 'pointer';
+            });
+        });
+    </script>
 </body>
 </html>
